@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Principal;
 
 public static class Menu
 {
@@ -31,20 +30,22 @@ public static class Menu
 
     private static void Login()
     {
+        Console.Clear(); // Clear console before login screen
         Console.Write("Enter your username: ");
         string username = Console.ReadLine();
 
-        Account account = Database.GetAccountByUsername(username);
+        Console.Write("Enter your password: ");
+        string password = ReadPassword();
+
+        Account account = Database.GetAccountByUsernameAndPassword(username, password);
 
         if (account == null)
         {
-            Console.WriteLine("Account not found. Creating a new account.");
-            CreateAccount(username);
+            Console.WriteLine("Invalid username or password.");
+            return;
         }
-        else
-        {
-            ShowAccountMenu(account);
-        }
+
+        ShowAccountMenu(account);
     }
 
     private static void CreateAccount(string username)
@@ -54,7 +55,10 @@ public static class Menu
         Console.Write("Enter your initial balance: ");
         double balance = double.Parse(Console.ReadLine());
 
-        Account newAccount = new Account(username, cardId, balance);
+        Console.Write("Set your password: ");
+        string password = ReadPassword();
+
+        Account newAccount = new Account(username, cardId, balance, password);
         Database.AddAccount(newAccount);
 
         Console.WriteLine("Account created successfully.");
@@ -63,6 +67,7 @@ public static class Menu
 
     private static void ShowAccountMenu(Account account)
     {
+        Console.Clear(); // Clear console before account menu
         Console.WriteLine($"Welcome, {account.Username}!");
         Console.WriteLine($"Card ID: {account.CardId}");
         Console.WriteLine($"Balance: {account.Balance:C}");
@@ -126,5 +131,31 @@ public static class Menu
         Console.Write("Enter salary amount: ");
         double amount = double.Parse(Console.ReadLine());
         account.GetSalary(amount);
+    }
+
+    private static string ReadPassword()
+    {
+        string password = "";
+        ConsoleKeyInfo key;
+
+        do
+        {
+            key = Console.ReadKey(true);
+
+            if (key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Enter)
+            {
+                password += key.KeyChar;
+                Console.Write("*");
+            }
+            else if (key.Key == ConsoleKey.Backspace && password.Length > 0)
+            {
+                password = password.Substring(0, (password.Length - 1));
+                Console.Write("\b \b");
+            }
+        }
+        while (key.Key != ConsoleKey.Enter);
+
+        Console.WriteLine(); // Newline after password input
+        return password;
     }
 }
