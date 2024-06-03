@@ -37,7 +37,7 @@ public static class Menu
         Console.Write("Enter your password: ");
         string password = ReadPassword();
 
-        Account account = Database.GetAccountByUsernameAndPassword(username, password);
+        Account account = Database.GetAccountByUsername(username);
 
         if (account == null)
         {
@@ -58,7 +58,7 @@ public static class Menu
         Console.Write("Set your password: ");
         string password = ReadPassword();
 
-        Account newAccount = new Account(username, cardId, balance, password);
+        Account newAccount = new Account(username, cardId, double.Parse(cardId));
         Database.AddAccount(newAccount);
 
         Console.WriteLine("Account created successfully.");
